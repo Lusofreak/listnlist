@@ -10,8 +10,15 @@ h1.title { color: rgb(158, 158, 158); }
 
 .pagecontent {
 	padding-top:  50px;
+	overflow: scroll;
 }
 
+/* Fix scrolling */
+body, .content, #app-container { position: static; } /* #app-container is for junior */
+.content { -webkit-overflow-scrolling: auto; }
+header + .content { padding-top: 44px; }
+header + .content-padded { padding-top: 55px; }
+.bar-title .title + [class*="button"]:last-child { top: 5px; } /* From ratchet.css, overridden by junior.css */
 
 .content-padded { margin: 20px; }
 
@@ -98,6 +105,7 @@ h1.title { color: rgb(158, 158, 158); }
 
 body > div {
 	background-image: url("../images/bg00.png");
+	overflow: scroll;
 }
 
 
