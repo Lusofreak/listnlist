@@ -1,0 +1,204 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="msapplication-tap-highlight" content="no" />
+<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+
+
+
+<!--link rel="shortcut icon" href="img/favicon.png"/-->
+
+
+
+
+<!-- external scripts -->
+<!--script src="js/jquery-1.11.1.min.js"></script>
+<script src="js/jquery.mobile-1.4.5.min.js"></script-->
+
+<script src="http://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script src="http://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script src="js/jquery.mobile-1.4.5.min.js"></script>
+
+<script src="js/jquery.ui.touch-punch.min.js"></script>
+
+
+<!-- CSS -->
+<link href="css/ratchet.css" rel="stylesheet" type="text/css">
+<link href="css/ratchet-theme-ios.css" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+<script src="js/ratchet.js"></script>
+<script src="js/app.js"></script>
+
+
+
+<title>Checklists</title>
+
+
+<script>
+
+
+	function onAppStart()
+	{
+	  	initUI();
+	}
+    
+
+    //document.addEventListener("deviceready", onAppStart, false);
+
+    $(document).ready(function() 
+    {
+        // are we running in native app or in a browser?
+        window.isphone = false;
+        if(document.URL.indexOf("http://") === -1 
+            && document.URL.indexOf("https://") === -1) 
+        {
+            window.isphone = true;
+        }
+
+        window.isphone = false;
+
+        if( !window.isphone ) 
+        {
+            onAppStart();
+        }
+    });
+
+</script>
+
+
+
+<!--script src="phonegap.js"></script-->
+
+
+
+</head>
+
+<body>
+
+	<header class="bar bar-nav">
+	  <h1 class="title">Checklists</h1>
+	</header>
+
+
+	<div class="pagecontent">
+
+		<div class="card from-left">
+
+			<ul class="table-view">
+			  <!--li class="table-view-cell">
+			  	 
+			    <a class="navigate-right" >
+					    <span class="icon icon-list"></span> <span class="icon icon-compose"></span><span class="icon icon-trash"></span>
+					    <span class="badge">0/5</span>
+					    Item 1
+			    </a>
+			    
+			  </li>
+			  <li class="table-view-cell">
+			    <a class="navigate-right">
+			    	<span class="badge">2/3</span>
+			    	Item 2
+			    </a>
+			  </li>
+			  
+			  <li class="table-view-cell">
+			    
+			    	 Item 3
+			    	 <div class="toggle">
+				      <div class="toggle-handle"></div>
+				    </div>
+			    
+			  </li-->
+			
+			</ul>
+			
+
+		</div>
+
+		<div class="content-padded">
+		  <span class="icon icon-plus" id="new-action-item"></span>
+		</div>
+
+	</div>
+
+	<nav class="bar bar-tab">
+	  <a class="tab-item active" href="#">
+	    <span class="icon icon-home"></span>
+	    <span class="tab-label">Home</span>
+	  </a>
+
+	  <a class="tab-item" href="#settingsModal">
+	    <span class="icon icon-gear"></span>
+	    <span class="tab-label">Settings</span>
+	  </a>
+	</nav>
+
+
+
+	<div id="settingsModal" class="modal">
+	  
+
+	  <div class="content">
+
+	  	<p class="content-padded">
+	  	<header>
+	    <a class="icon icon-close pull-right" href="#settingsModal"></a>
+	    </header>
+		</p>
+		<br/>
+		
+	    <p class="content-padded">
+
+		<h4>Reset after</h4>
+	    <select id="reset-combo">
+		  <option value="1">1 hour</option>
+		  <option value="2">2 hours</option>
+		  <option value="4">4 hours</option>
+		  <option value="8">8 hours</option>
+		  <option value="24">24 hours</option>
+		</select>
+
+		<br/>
+		<h4>Application Theme</h4>
+	    <select id="theme-combo">
+		  <option value="0">Aquatica</option>
+		  <option value="1">Sunset</option>
+		  <option value="2">Glowing Flames</option>
+		  <option value="3">Ocean Deep</option>
+		  <option value="4">Bokeh Glow</option>
+		  <option value="5">Autumn</option>
+		  <option value="6">Purple Haze</option>
+		</select>
+
+		<hr/>
+
+		<h4>Disclaimer</h4>
+
+		<p>
+		This application provided by Project Furnace is supplied "AS IS" without any warranties and support.</p>
+
+		<p>Project Furnace assumes no responsibility or liability for the use of the software, conveys no license or title under any patent, copyright, or mask work right to the product.</p>
+
+		<p>
+		Project Furnace reserves the right to make changes in the software without notification. Project Furnace also make no representation or warranty that such application will be suitable for the specified use without further testing or modification.</p>
+
+		<p>For further information, contact Fabrice Rasoamiaramanana</p>
+
+	  </div>
+	</div>
+
+
+
+
+	<link href="css/style.css" rel="stylesheet" type="text/css">
+
+</body>
+
+
+
+</html>
