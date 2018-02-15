@@ -5,7 +5,7 @@ var lastClickedObject = null;
 var app_id = "org.projectfurnace.checklist";
 
 
-var PARENTID = null;
+var PARENTID = 'top-level';
 
 
 var ACTIONS = {};
@@ -65,9 +65,9 @@ String.format = function() {
 
 
 
-function childActionItemAsHTML(caption, id, bChecked)
+function childActionItemAsHTML(caption, id, bChecked, index)
 {
-	var html = `<li class="table-view-cell" id="{1}"  data-source="{1}">
+	var html = `<li class="table-view-cell" id="{1}"  data-source="{1}" data-index="{3}">
 		    	 	 {0}
 			    	 <div class="toggle{2}" id="toggle-{1}" data-source="{1}">
 				      <div class="toggle-handle" data-source="{1}"></div>
@@ -75,31 +75,31 @@ function childActionItemAsHTML(caption, id, bChecked)
 			    
 			  </li>`;
 
-	return String.format(html, caption, id, bChecked ? " active" : "");
+	return String.format(html, caption, id, bChecked ? " active" : "", index);
 }
 
 
-function longPressedActionItemAsHTML(id)
+function longPressedActionItemAsHTML(id, index)
 {
-	var html = `<li class="table-view-cell" id="{0}">
-					</span><span class="icon icon-list" data-source="{0}"></span> <span class="icon icon-compose" data-source="{0}"></span><span class="icon icon-trash" data-source="{0}"></span> 
+	var html = `<li class="table-view-cell" id="{0}" data-index="{2}">
+					</span><span class="icon icon-list" data-source="{0}"></span> <span class="icon icon-compose" data-source="{0}"></span><span class="icon icon-trash" data-source="{0}"></span>{1} 
 			  </li>`;
 
-  	return String.format(html,id);
+  	return String.format(html,id, ACTIONS[id].caption, index);
 }
 
 
 
-function parentActionItemAsHTML(caption, id, nbCheckedChildren, nbChildren)
+function parentActionItemAsHTML(caption, id, nbCheckedChildren, nbChildren, index)
 {
-	var html = `<li class="table-view-cell" id="{1}">
-					<a class="navigate-right"  data-source="{1}" >
+	var html = `<li class="table-view-cell" id="{1}" data-index="{4}">
+					<a class="navigate-right"  data-source="{1}"  data-index="{4}">
 					<span class="badge">{2}/{3}</span>
 		    	 	 {0}
 			    	</a>
 			  </li>`;
 
-	return String.format(html, caption, id, nbCheckedChildren, nbChildren );
+	return String.format(html, caption, id, nbCheckedChildren, nbChildren, index );
 
 }
 
@@ -159,12 +159,12 @@ function coreAddActionItem(caption, id, parentId)
 	}
 
 
-	if (parentId !== null)
+	if (parentId !== 'top-level')
 	{
 		var parent = ACTIONS[parentId];
 		if (parent !== null && typeof(parent) !== "undefined")
 		{
-			parent.children[id] = id;
+			parent.children.push(id);
 		}
 	}
 
@@ -189,12 +189,13 @@ function coreEditActionItem(caption, id)
 
 function coreDeleteActionItem(id)
 {
-	var parent = ACTIONS[id];
+	var parent = ACTIONS[ACTIONS[id].parent];
 	if (parent !== null && typeof(parent) !== "undefined")
 	{
-		if (parent.parent !== null)
+		var index = parent.children.indexOf(id);
+		if (index !== -1)
 		{
-			delete ACTIONS[parent.parent].children[id];
+			parent.children.splice(index, 1);
 		}
 		delete ACTIONS[id];
 	}
@@ -209,7 +210,7 @@ function coreNumberOfChildren(id)
 	var parent = ACTIONS[id];
 	if (parent !== null && typeof(parent) !== "undefined")
 	{
-		return Object.keys(parent.children).length;
+		return parent.children.length;
 	}
 
 	return 0;
@@ -222,9 +223,9 @@ function coreNumberOfCheckedChildren(id)
 	var parent = ACTIONS[id];
 	if (parent !== null && typeof(parent) !== "undefined")
 	{
-		for (var childId in parent.children)
+		for (var i = 0; i < parent.children.length; i++)
 		{
-			count += ACTIONS[childId].checked ? 1 : 0;
+			count += ACTIONS[parent.children[i]].checked ? 1 : 0;
 		}
 	}
 
@@ -265,41 +266,37 @@ function refreshUI(bWithAnimation = false)
 {
 	var html = '';
 
-	if (PARENTID !== null)
-	{
-		html += `
-		<button class="btn btn-link btn-nav pull-left" data-source="{1}">
-		    <span class="icon icon-left-nav" data-source="{1}"></span>
-		    Left
-		  </button>
-		  <h1 class="title">{0}</h1>`;
 
-	    $('header.bar').html(String.format(html, ACTIONS[PARENTID].caption, ACTIONS[PARENTID].parent));  
+	html += `
+	<button class="btn btn-link btn-nav pull-left" data-source="{1}">
+	    <span class="icon icon-left-nav" data-source="{1}"></span>
+	    Left
+	  </button>
+	  <h1 class="title">{0}</h1>`;
 
-	}
-	else
-	{
-		 $('header.bar').html('<h1 class="title">HOME</h1>');
-	}
+    $('header.bar').html(String.format(html, ACTIONS[PARENTID].caption, ACTIONS[PARENTID].parent));  
+
+	
+
 
 	html = '';
 
-
-	for (var a in ACTIONS)
+	var index = 0;
+	for (var i = 0; i < ACTIONS[PARENTID].children.length; i++)
 	{
-		var action = ACTIONS[a];
-		if (action.parent === PARENTID)
-		{
-			if (coreHasChildren(action.id))
-			{
-				html += parentActionItemAsHTML(action.caption, action.id, coreNumberOfCheckedChildren(action.id), coreNumberOfChildren(action.id));
+		var action = ACTIONS[ACTIONS[PARENTID].children[i]];
 
-			}
-			else
-			{
-				html += childActionItemAsHTML(action.caption, action.id, action.checked);
-			}
+		if (coreHasChildren(action.id))
+		{
+			html += parentActionItemAsHTML(action.caption, action.id, coreNumberOfCheckedChildren(action.id), coreNumberOfChildren(action.id), index);
+
 		}
+		else
+		{
+			html += childActionItemAsHTML(action.caption, action.id, action.checked, index);
+		}
+		index++;
+	
 	}
 
 	$('.table-view').html(html);
@@ -343,6 +340,25 @@ function initUI()
 	{
 		ACTIONS = {};
 	}
+
+
+	// temporary hack
+	if (ACTIONS['top-level'] === null || typeof(ACTIONS['top-level']) === "undefined")
+	{
+		var topLevelAction = { id: 'top-level', caption: 'HOME', children: []};
+		for (var id in ACTIONS)
+		{
+			var action = ACTIONS[id];
+			action.children = Object.keys(action.children);
+			if (action.parent === null )
+			{
+				action.parent = 'top-level';
+				topLevelAction.children.push(id);
+			}
+		}
+		ACTIONS['top-level'] = topLevelAction;
+	}
+	// end temporary hack
 
 	var last = localStorage.getItem(app_id + '.timestamp');
 	if (last !== null && typeof(last) !== "undefined")
@@ -398,10 +414,34 @@ function tapholdEventHandler(evt)
     if (target.is('a.navigate-right.ui-link') || target.is('a.navigate-right') || target.is('li.table-view-cell'))
     {
       	var id =  target.attr("data-source");
+      	var index =  target.attr("data-index");
 
-		$("#" + id).replaceWith(longPressedActionItemAsHTML(id));
+		$("#" + id).replaceWith(longPressedActionItemAsHTML(id, index));
 
-		//setTimeout(function() {$("#" + id).draggable(); }, 100);
+		setTimeout(
+			function() {
+				$("#" + id).draggable({axis: "y"}); 
+				$("li.table-view-cell").droppable(
+					{ drop: function( event, ui ) 
+						{
+							if (typeof(event) !== "undefined" && event !== null)
+							{
+								var to = parseInt($(event.target).attr('data-index'));
+								var from = parseInt($(event.toElement).attr('data-index'));
+								var parentAction = ACTIONS[ACTIONS[id].parent];
+
+								var toInsert = parentAction.children[from];
+								parentAction.children.splice(to, 0, toInsert);
+								parentAction.children.splice(from + 1, 1);
+								saveAll();
+							}
+
+							setTimeout(function() {refreshUI(false);}, 80);
+						}
+				});
+			}
+			, 100
+		);
     }
 }
 
@@ -445,16 +485,12 @@ function clickPerformed(evt)
 	else if (lastClickedObject.is('button.btn.btn-link.btn-nav.pull-left')  || lastClickedObject.is('span.icon.icon-left-nav') )
 	{
 		PARENTID =  lastClickedObject.attr("data-source");
-		if (PARENTID === "null")
-		{
-			PARENTID = null; 
-		}
 		refreshUI(true);
 
 	}
 	else if (lastClickedObject.is('span.icon.icon-home') )
 	{
-		PARENTID = null; 
+		PARENTID = 'top-level'; 
 		refreshUI(true);
 	}
 	else if (lastClickedObject.is('div.toggle-handle') || lastClickedObject.is('div.toggle'))
@@ -467,9 +503,9 @@ function clickPerformed(evt)
 		{
 			var parent = ACTIONS[action.parent];
 			parent.checked = true;
-			for (var child in parent.children)
+			for (var i = 0; i < parent.children.length; i++)
 			{
-				if (ACTIONS[child].checked === false)
+				if (ACTIONS[parent.children[i]].checked === false)
 				{
 					parent.checked = false;
 					break;
@@ -478,4 +514,15 @@ function clickPerformed(evt)
 		}
 		saveAll();
 	}
+}
+
+
+function displayTopLevel()
+{
+	var str = '';
+	for(var i = 0; i < ACTIONS['top-level'].children.length; i++)
+	{
+		str += ACTIONS[ACTIONS['top-level'].children[i]].caption + ',';
+	}
+	return str;
 }

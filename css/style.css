@@ -114,3 +114,13 @@ body > div {
     0%   {margin-left: 500px;}
     100% {margin-left: 10px;}
 }
+
+li.ui-draggable
+{
+    background-color: rgba(250, 169, 27, 0.2);
+}
+
+li.ui-droppable-hover
+{
+    background-color: rgba(0, 125, 0, 0.2);
+}
