@@ -308,6 +308,51 @@ function refreshUI(bWithAnimation = false)
 	else
 		$('span.icon-plus').removeClass('pulse');
 
+
+	if (index === 1 && PARENTID === 'top-level')
+	{
+		setTimeout(
+			function()
+			{ 
+				html = `
+				<div class="swipe-left">
+					<img src="images/swipe-left.png">
+					<p class="instruction">Swipe left to reveal actions</p>
+				</div>
+				`;
+				$('div.pagecontent > div.content-padded').append(html); 
+			}
+		, 1000);
+
+		setTimeout(
+			function()
+			{ 
+				html = `
+				<div class="swipe-right">
+					<img src="images/swipe-right.png">
+					<p class="instruction">Swipe right to close actions</p>
+				</div>
+				`;
+				$('div.pagecontent > div.content-padded').append(html); 
+			}
+		, 7000);
+
+		setTimeout(
+			function()
+			{ 
+				$('div.swipe-left').remove();
+			}
+		, 6000);
+
+
+		setTimeout(
+			function()
+			{ 
+				$('div.swipe-right').remove();
+			}
+		, 12000);
+	}
+
 	if (bWithAnimation)
 	{
 		$('.card').addClass('from-left');

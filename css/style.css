@@ -168,3 +168,35 @@ span.icon-plus.pulse
       box-shadow: 0 0 0 0 rgba(13,206,176, 0);
   }
 }
+
+
+.swipe-left {
+    position: absolute;
+    z-index: 100;
+    top: 55px;
+    animation: toTheRight 1s 4;
+}
+
+.swipe-right {
+    position: absolute;
+    z-index: 100;
+    top: 55px;
+    left: 80px;
+    animation: toTheRight 1s 4 reverse;
+}
+
+.instruction {
+    color: white;
+    text-transform: uppercase;
+}
+
+@keyframes toTheRight {
+  0% {
+    left: 10px;
+  }
+  100% {
+      left: 80px;
+  }
+}
+
+
