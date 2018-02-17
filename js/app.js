@@ -309,7 +309,8 @@ function refreshUI(bWithAnimation = false)
 		$('span.icon-plus').removeClass('pulse');
 
 
-	if (index === 1 && PARENTID === 'top-level')
+	// if it is the first action item created (i.e: it is a top level item and has no children)
+	if (index === 1 && PARENTID === 'top-level' && Object.keys(ACTIONS).length === 2)
 	{
 		setTimeout(
 			function()
@@ -397,26 +398,10 @@ function initUI()
 	if (ACTIONS === null || typeof(ACTIONS) === "undefined")
 	{
 		ACTIONS = {};
-	}
-
-
-	// temporary hack
-	if (ACTIONS['top-level'] === null || typeof(ACTIONS['top-level']) === "undefined")
-	{
 		var topLevelAction = { id: 'top-level', caption: 'HOME', children: []};
-		for (var id in ACTIONS)
-		{
-			var action = ACTIONS[id];
-			action.children = Object.keys(action.children);
-			if (action.parent === null )
-			{
-				action.parent = 'top-level';
-				topLevelAction.children.push(id);
-			}
-		}
 		ACTIONS['top-level'] = topLevelAction;
 	}
-	// end temporary hack
+
 
 	var last = localStorage.getItem(app_id + '.timestamp');
 	if (last !== null && typeof(last) !== "undefined")
