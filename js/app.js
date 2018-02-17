@@ -123,7 +123,7 @@ function captionEditAsHTML(caption, id)
 
 function addActionItemAsHTML()
 {
-	return captionEditAsHTML("Edit action item...", guid());
+	return captionEditAsHTML("", guid());
 }
 
 
@@ -152,7 +152,7 @@ function coreAddActionItem(caption, id, parentId)
 {
 	if (ACTIONS[id] === null || typeof(ACTIONS[id]) === "undefined")
 	{
-		ACTIONS[id] = {caption: caption, id: id, children: {}, checked:false, parent: parentId};
+		ACTIONS[id] = {caption: caption, id: id, children: [], checked:false, parent: parentId};
 	}
 	else
 	{
@@ -160,13 +160,11 @@ function coreAddActionItem(caption, id, parentId)
 	}
 
 
-	if (parentId !== 'top-level')
+
+	var parent = ACTIONS[parentId];
+	if (parent !== null && typeof(parent) !== "undefined")
 	{
-		var parent = ACTIONS[parentId];
-		if (parent !== null && typeof(parent) !== "undefined")
-		{
-			parent.children.push(id);
-		}
+		parent.children.push(id);
 	}
 
 	
@@ -304,6 +302,11 @@ function refreshUI(bWithAnimation = false)
 	}
 
 	$('.table-view').html(html);
+
+	if (index === 0)
+		$('span.icon-plus').addClass('pulse');
+	else
+		$('span.icon-plus').removeClass('pulse');
 
 	if (bWithAnimation)
 	{
