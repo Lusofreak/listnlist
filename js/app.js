@@ -79,13 +79,14 @@ function childActionItemAsHTML(caption, id, bChecked, index)
 }
 
 
-function longPressedActionItemAsHTML(id, index)
+function swipedActionItemAsHTML(id, index)
 {
-	var html = `<li class="table-view-cell" id="{0}" data-index="{2}">
-					</span><span class="icon icon-list" data-source="{0}"></span> <span class="icon icon-compose" data-source="{0}"></span><span class="icon icon-trash" data-source="{0}"></span>{1} 
+	var html = `<li class="table-view-cell btn-on" id="{0}" data-source="{0}" data-index="{2}">
+					</span><span class="icon icon-list" data-source="{0}"></span> <span class="icon icon-compose" data-source="{0}"></span><span class="icon icon-trash" data-source="{0}"></span> {1} 
 			  </li>`;
 
-  	return String.format(html,id, ACTIONS[id].caption, index);
+  	//return String.format(html,id, ACTIONS[id].caption, index);
+  	return String.format(html,id, '', index);
 }
 
 
@@ -108,7 +109,7 @@ function captionEditAsHTML(caption, id)
 {
 	var html = `<li id="{1}">
 			  	<form>
-				  <input type="text" placeholder="{0}" data-source="{1}" id="caption-input">
+				  <input type="text" value="{0}" placeholder="Edit caption..." data-source="{1}" id="caption-input">
 				</form>
 			  </li>`;
 
@@ -266,13 +267,16 @@ function refreshUI(bWithAnimation = false)
 {
 	var html = '';
 
+	if (PARENTID !== 'top-level')
+	{
+		html += `
+		<button class="btn btn-link btn-nav pull-left" data-source="{1}">
+		    <span class="icon icon-left-nav" data-source="{1}"></span>
+		    Left
+		  </button>`;
+	}
 
-	html += `
-	<button class="btn btn-link btn-nav pull-left" data-source="{1}">
-	    <span class="icon icon-left-nav" data-source="{1}"></span>
-	    Left
-	  </button>
-	  <h1 class="title">{0}</h1>`;
+	html += '<h1 class="title">{0}</h1>';
 
     $('header.bar').html(String.format(html, ACTIONS[PARENTID].caption, ACTIONS[PARENTID].parent));  
 
@@ -305,7 +309,13 @@ function refreshUI(bWithAnimation = false)
 	{
 		$('.card').addClass('from-left');
 	}
-	setTimeout(function(){ $('.card').removeClass('from-left'); }, 1400);
+	setTimeout(
+		function()
+		{ 
+			$('.card').removeClass('from-left'); 
+			$('li.table-view-cell').on('swipe', swipeEventHandler);
+		}
+	, 1400);
 }
 
 function initUI()
@@ -404,6 +414,40 @@ function applyResetTimer(val)
 	localStorage.setItem(app_id + ".resettimer", val);
 }
 
+function swipeEventHandler(evt)
+{
+	var target = $(evt.target);
+    if (target.is('a.navigate-right.ui-link') || target.is('a.navigate-right') || target.is('li.table-view-cell'))
+    {
+      	var id =  target.attr("data-source");
+      	var index =  target.attr("data-index");
+
+      	if ($("#" + id).hasClass('btn-on') === false)
+      	{
+			$("#" + id).replaceWith(swipedActionItemAsHTML(id, index));
+      	}
+		else
+		{
+			var action = ACTIONS[id];
+
+			if (coreHasChildren(action.id))
+			{
+				$("#" + id).replaceWith(parentActionItemAsHTML(action.caption, action.id, coreNumberOfCheckedChildren(action.id), coreNumberOfChildren(action.id), index));
+
+			}
+			else
+			{
+				$("#" + id).replaceWith(childActionItemAsHTML(action.caption, action.id, action.checked, index));
+			}
+		}
+		setTimeout(
+			function() {
+				$("#" + id).on('swipe', swipeEventHandler);
+			}
+		,100);
+	}
+}
+
 
 
 
@@ -416,32 +460,26 @@ function tapholdEventHandler(evt)
       	var id =  target.attr("data-source");
       	var index =  target.attr("data-index");
 
-		$("#" + id).replaceWith(longPressedActionItemAsHTML(id, index));
 
-		setTimeout(
-			function() {
-				$("#" + id).draggable({axis: "y"}); 
-				$("li.table-view-cell").droppable(
-					{ drop: function( event, ui ) 
-						{
-							if (typeof(event) !== "undefined" && event !== null)
-							{
-								var to = parseInt($(event.target).attr('data-index'));
-								var from = parseInt($(event.toElement).attr('data-index'));
-								var parentAction = ACTIONS[ACTIONS[id].parent];
+      	$("#" + id).draggable({axis: "y"}); 
+		$("li.table-view-cell").droppable(
+			{ drop: function( event, ui ) 
+				{
+					if (typeof(event) !== "undefined" && event !== null)
+					{
+						var to = parseInt($(event.target).attr('data-index'));
+						var from = parseInt($(event.toElement).attr('data-index'));
+						var parentAction = ACTIONS[ACTIONS[id].parent];
 
-								var toInsert = parentAction.children[from];
-								parentAction.children.splice(to, 0, toInsert);
-								parentAction.children.splice(from + 1, 1);
-								saveAll();
-							}
+						var toInsert = parentAction.children[from];
+						parentAction.children.splice(to, 0, toInsert);
+						parentAction.children.splice(from + 1, 1);
+						saveAll();
+					}
 
-							setTimeout(function() {refreshUI(false);}, 80);
-						}
-				});
-			}
-			, 100
-		);
+					setTimeout(function() {refreshUI(false);}, 80);
+				}
+		});
     }
 }
 

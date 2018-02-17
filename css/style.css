@@ -13,6 +13,9 @@ h1.title { color: rgb(158, 158, 158); }
 	overflow: scroll;
 }
 
+
+div.ui-loader { visibility: hidden; display: none; }
+
 /* Fix scrolling */
 body, .content, #app-container { position: static; } /* #app-container is for junior */
 .content { -webkit-overflow-scrolling: auto; }
@@ -106,6 +109,7 @@ header + .content-padded { padding-top: 55px; }
 body > div {
 	background-image: url("../images/bg00.png");
 	overflow: scroll;
+    min-height: 100%;
 }
 
 
@@ -122,5 +126,9 @@ li.ui-draggable
 
 li.ui-droppable-hover
 {
-    background-color: rgba(0, 125, 0, 0.2);
+    border-top-color: rgba(0, 255, 0, 1);
+    border-top: 4px solid;
 }
+
+
+span.icon { z-index: 99; }
