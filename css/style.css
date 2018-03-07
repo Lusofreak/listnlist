@@ -10,11 +10,17 @@ h1.title { color: rgb(158, 158, 158); }
 
 .pagecontent {
 	padding-top:  50px;
+  padding-bottom:  50px;
 	overflow: scroll;
 }
 
 
 div.ui-loader { visibility: hidden; display: none; }
+
+.card-id-hidden {
+  visibility: hidden;
+  display: none;
+}
 
 /* Fix scrolling */
 body, .content, #app-container { position: static; } /* #app-container is for junior */
@@ -24,6 +30,9 @@ header + .content-padded { padding-top: 55px; }
 .bar-title .title + [class*="button"]:last-child { top: 5px; } /* From ratchet.css, overridden by junior.css */
 
 .content-padded { margin: 20px; }
+
+
+div.ui-select > div > span { visibility: hidden; }
 
 .card, ul.table-view 
 { 
@@ -130,6 +139,9 @@ li.ui-droppable-hover
     border-top: 4px solid;
 }
 
+
+.checklist-download { color: white; }
+.checklist-download > p { color: black; }
 
 span.icon { z-index: 99; }
 

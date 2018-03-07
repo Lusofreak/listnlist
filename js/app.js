@@ -10,6 +10,8 @@ var PARENTID = 'top-level';
 
 var ACTIONS = {};
 
+var EXPORT_ACTIONS = [];
+
 
 
 
@@ -82,7 +84,7 @@ function childActionItemAsHTML(caption, id, bChecked, index)
 function swipedActionItemAsHTML(id, index)
 {
 	var html = `<li class="table-view-cell btn-on" id="{0}" data-source="{0}" data-index="{2}">
-					</span><span class="icon icon-list" data-source="{0}"></span> <span class="icon icon-compose" data-source="{0}"></span><span class="icon icon-trash" data-source="{0}"></span> {1} 
+					<span class="icon icon-list" data-source="{0}"></span> <span class="icon icon-compose" data-source="{0}"></span><span class="icon icon-share" data-source="{0}"></span><span class="icon icon-trash pull-right" data-source="{0}"></span> {1} 
 			  </li>`;
 
   	//return String.format(html,id, ACTIONS[id].caption, index);
@@ -153,6 +155,11 @@ function coreAddActionItem(caption, id, parentId)
 	if (ACTIONS[id] === null || typeof(ACTIONS[id]) === "undefined")
 	{
 		ACTIONS[id] = {caption: caption, id: id, children: [], checked:false, parent: parentId};
+		var parent = ACTIONS[parentId];
+		if (parent !== null && typeof(parent) !== "undefined")
+		{
+			parent.children.push(id);
+		}
 	}
 	else
 	{
@@ -161,11 +168,7 @@ function coreAddActionItem(caption, id, parentId)
 
 
 
-	var parent = ACTIONS[parentId];
-	if (parent !== null && typeof(parent) !== "undefined")
-	{
-		parent.children.push(id);
-	}
+	
 
 	
 	saveAll();
@@ -196,7 +199,13 @@ function coreDeleteActionItem(id)
 		{
 			parent.children.splice(index, 1);
 		}
-		delete ACTIONS[id];
+		
+
+		prepareExport(id);
+		for (var i = 0; i < EXPORT_ACTIONS.length; i++)
+		{
+			delete ACTIONS[EXPORT_ACTIONS[i].id];
+		}
 	}
 
 
@@ -547,6 +556,53 @@ function clickPerformed(evt)
 		// fetch real name from id
 		$("#" + id).replaceWith(captionEditAsHTML(caption, id));
 	}
+	else if (lastClickedObject.is('span.icon.icon-share'))
+	{
+		var id =  lastClickedObject.attr("data-source");
+		prepareExport(id);
+
+		exportModal(id);
+	}
+	else if (lastClickedObject.is('#export-btn'))
+	{
+		var id = $('#exportid').val();
+		var data = $('#jsondata').val();
+		var desc = $('#checklist-description').val();
+		var category = $('#export-category').val();
+
+	 	$('#exportModal').removeClass('active');
+
+	 	$.ajaxSetup(
+		    {
+		      crossDomain: true,
+		      cache: false
+		    }
+		  );
+	 	
+
+	 	var jqxhr = $.post(
+		    "http://listnlist.projectfurnace.org/php/commit.php",
+		    { id : id, data : data,  category : Number(category), description: desc, caption: ACTIONS[id].caption }
+		  );
+
+		  jqxhr.done(
+		    function(d) 
+		    {
+		      	$('.title').text('export successful');
+		    }
+		  );
+
+		  jqxhr.fail(
+		    function()
+		    {
+		      	$('.title').text('export failed');
+		    }
+		  );
+
+		refreshUI(false);
+
+
+	 }
 	else if (lastClickedObject.is('span.icon.icon-list')  || lastClickedObject.is('a.navigate-right') )
 	{
 		PARENTID =  lastClickedObject.attr("data-source");
@@ -563,6 +619,120 @@ function clickPerformed(evt)
 	{
 		PARENTID = 'top-level'; 
 		refreshUI(true);
+	}
+	else if (lastClickedObject.is('span.icon.icon-download') )
+	{
+		$('#download-list').html('');
+
+		$('#downloadModal').addClass('active');
+
+		$.ajaxSetup(
+		    {
+		      crossDomain: true,
+		      cache: false
+		    }
+		  );
+
+		  var jqxhr = $.post(
+		    "http://listnlist.projectfurnace.org/php/field_request.php",
+		    { where : "1", field : "ID,CAPTION,DESCRIPTION,CATEGORY" }
+		  );
+
+
+		  jqxhr.done(
+		    function(raw_data)
+		    {
+		      if (raw_data != null && raw_data.length > 2)
+			  {
+			    var tmp = raw_data.substring(0, raw_data.length - 3);
+			    var strArray = tmp.split('~');
+
+			    var html = '';
+
+			    for (var i = 0; i < strArray.length; i++)
+			    {
+			    	var response = JSON.parse(strArray[i]);
+			    	tmp = `<li class="table-view-cell media checklist-download" data-source="{0}">
+							    <a class="navigate-right checklist-download" data-source="{0}">
+							      <img class="media-object pull-left" src="images/{3}.png">
+							      <div class="media-body checklist-download" data-source="{0}">
+							        {1}
+							        <p class="checklist-download" data-source="{0}">{2}</p>
+							      </div>
+							    </a>
+							  </li>`;
+
+					html += String.format(tmp, response.ID, response.CAPTION, response.DESCRIPTION, response.CATEGORY);
+
+					
+			    }
+
+			    $('#download-list').html(html);
+			  }
+		    }
+		  );
+
+		  jqxhr.fail(
+		    function()
+		    {
+
+		    }
+		  );
+	}
+	else if (lastClickedObject.is('.checklist-download'))
+	{
+		var id = lastClickedObject.attr("data-source");
+		$.ajaxSetup(
+		    {
+		      crossDomain: true,
+		      cache: false
+		    }
+		  );
+
+		$('#downloadModal').removeClass('active');
+
+
+		var w = "ID='" + id + "\'";
+
+		  var jqxhr = $.post(
+		    "http://listnlist.projectfurnace.org/php/field_request.php",
+		    { where : w.toString(), field : "JSONDATA" }
+		  );
+
+
+		  jqxhr.done(
+		    function(raw_data)
+		    {
+		      if (raw_data != null && raw_data.length > 2)
+			  {
+			    var tmp = raw_data.substring(0, raw_data.length - 3);
+			    var response = JSON.parse(tmp);
+			    var obj = JSON.parse(response.JSONDATA);
+
+			    for (var i = 0; i < obj.length; i++)
+			    {
+			    	ACTIONS[obj[i].id] = obj[i];
+			    }
+
+			    if (ACTIONS['top-level'].children.indexOf(id) === -1)
+			    {
+			    	ACTIONS['top-level'].children.push(id);
+			    }
+
+			    refreshUI(false);
+			    PARENTID='top-level';
+
+			    saveAll();
+			  }
+		    }
+		  );
+
+		  jqxhr.fail(
+		    function()
+		    {
+
+		    }
+		  );
 	}
 	else if (lastClickedObject.is('div.toggle-handle') || lastClickedObject.is('div.toggle'))
 	{
@@ -596,4 +766,39 @@ function displayTopLevel()
 		str += ACTIONS[ACTIONS['top-level'].children[i]].caption + ',';
 	}
 	return str;
+}
+
+
+
+
+
+
+function prepareExport(id)
+{
+	var action = ACTIONS[id];
+	if (typeof(action) !== "undefined" && action !== null)
+	{
+		if (action.parent === 'top-level')
+			EXPORT_ACTIONS = [];
+
+
+		var children = action.children;
+		EXPORT_ACTIONS.push({caption: action.caption, id: action.id, children: children, checked:false, parent: action.parent});
+
+		for (var i = 0; i < children.length; i++)
+		{
+			prepareExport(children[i]);
+		}
+	}
+}
+
+
+function exportModal(id)
+{
+	$('#jsondata').val(JSON.stringify(EXPORT_ACTIONS));
+	$('#exportid').val(id);
+	$('#checklist-description').val('');
+
+
+	$("#exportModal").addClass('active');
 }

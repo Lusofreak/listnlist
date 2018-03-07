@@ -115,11 +115,91 @@
 	    <span class="tab-label">Home</span>
 	  </a>
 
+	  <a class="tab-item" >
+	    <span class="icon icon-download"></span>
+	    <span class="tab-label">Download</span>
+	  </a>
+
 	  <a class="tab-item" href="#settingsModal">
 	    <span class="icon icon-gear"></span>
 	    <span class="tab-label">Settings</span>
 	  </a>
+
+	  <a class="tab-item" href="#aboutModal">
+	    <span class="icon">?</span>
+	    <span class="tab-label">About</span>
+	  </a>
 	</nav>
+
+
+
+	<div id="aboutModal" class="modal">
+	  
+
+	  <div class="content">
+
+	  	<p class="content-padded">
+	  	<header>
+	    <a class="icon icon-close pull-right" href="#aboutModal"></a>
+	    </header>
+		</p>
+		<br/>
+		<h4>Disclaimer</h4>
+
+		<p>
+		This application provided by Project Furnace is supplied "AS IS" without any warranties and support.</p>
+
+		<p>Project Furnace assumes no responsibility or liability for the use of the software, conveys no license or title under any patent, copyright, or mask work right to the product.</p>
+
+		<p>
+		Project Furnace reserves the right to make changes in the software without notification. Project Furnace also make no representation or warranty that such application will be suitable for the specified use without further testing or modification.</p>
+
+		<p>For further information, contact Fabrice Rasoamiaramanana</p>
+
+		</div>
+	</div>
+
+
+	<div id="exportModal" class="modal">
+	  
+
+	  <div class="content">
+
+	  	<p class="content-padded">
+	  	<header>
+	    <a class="icon icon-close pull-right" href="#exportModal"></a>
+	    </header>
+		</p>
+		<br/>
+		
+	   <form>
+		  
+
+		  <label>Category</label>
+		  <select id="export-category">
+		  	<option value="0">Housing</option>
+		  	<option value="1">Transportation</option>
+		  	<option value="2">Medical</option>
+		  	<option value="3">Utilities</option>
+		  	<option value="4">Personal</option>
+		  	<option value="5">Travel</option>
+		  	<option value="99">Miscelleanous</option>
+		  </select>
+
+
+		  <label>Description</label>
+		  <textarea rows="7" id="checklist-description" placeholder="Describe your checklist"></textarea>
+
+		 
+		  <textarea id="jsondata" class="card-id-hidden"></textarea>
+		  <input id="exportid" class="card-id-hidden" type="text">
+		  
+		</form>
+
+		<button class="btn btn-positive btn-block" id="export-btn">Export</button>
+
+	  </div>
+	</div>
 
 
 
@@ -158,20 +238,30 @@
 		  <option value="6">Purple Haze</option>
 		</select>
 
-		<hr/>
+	
+	  </div>
+	</div>
 
-		<h4>Disclaimer</h4>
 
-		<p>
-		This application provided by Project Furnace is supplied "AS IS" without any warranties and support.</p>
 
-		<p>Project Furnace assumes no responsibility or liability for the use of the software, conveys no license or title under any patent, copyright, or mask work right to the product.</p>
+	<div id="downloadModal" class="modal">
+	  
 
-		<p>
-		Project Furnace reserves the right to make changes in the software without notification. Project Furnace also make no representation or warranty that such application will be suitable for the specified use without further testing or modification.</p>
+	  <div class="content">
 
-		<p>For further information, contact Fabrice Rasoamiaramanana</p>
+	  	<p class="content-padded">
+	  	<header>
+	    <a class="icon icon-close pull-right" href="#downloadModal"></a>
+	    </header>
+		</p>
+		<br/>
+		
+	    <p class="content-padded">
 
+		<h4>Download checklists</h4>
+	  	<ul class="table-view" id="download-list">
+	  	</ul>
+	
 	  </div>
 	</div>
 
